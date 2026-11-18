@@ -1,0 +1,9 @@
+deepagents
+langchain-openai
+langchain-core
+gitpython
+PyGithub
+python-dotenv
+pydantic
+streamlit
+pytest
