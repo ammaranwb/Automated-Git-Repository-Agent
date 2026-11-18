@@ -97,9 +97,37 @@ def commit_changes(message: str) -> str:
         return f"Successfully committed: {message}"
 
 
+@tool
+def push_branch(branch_name: str = "", remote_name: str = "origin") -> str:
+    """Push a local branch to a Git remote (defaults to active branch and 'origin')."""
+
+    with get_repo() as repo:
+        target_branch = branch_name.strip() or repo.active_branch.name
+
+        if target_branch not in [b.name for b in repo.branches]:
+            return f"Error: Local branch '{target_branch}' does not exist."
+
+        if remote_name not in [r.name for r in repo.remotes]:
+            return f"Error: Remote '{remote_name}' is not configured in this repository."
+
+        # Block accidental pushes to protected default branches unless explicitly requested
+        if target_branch in {"main", "master"}:
+            return (
+                f"Blocked: Pushing directly to '{target_branch}' requires explicit user approval. "
+                "Push a feature branch instead or confirm pushing to main/master."
+            )
+
+        output = repo.git.push("--set-upstream", remote_name, target_branch)
+        return (
+            f"Successfully pushed '{target_branch}' to '{remote_name}'."
+            + (f"\nDetails:\n{output}" if output else "")
+        )
+
+
 git_tools = [
     get_git_status,
     create_branch,
     stage_file,
-    commit_changes
+    commit_changes,
+    push_branch,
 ]
