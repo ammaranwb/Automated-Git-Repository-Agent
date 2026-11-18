@@ -118,16 +118,19 @@ def list_github_pull_requests(
 
         results = []
 
-        for pr in pull_requests[:min(limit, 30)]:
+        for pr in pull_requests:
             results.append({
                 "number": pr.number,
                 "title": pr.title,
                 "state": pr.state,
-                "author": pr.user.login,
+                "author": pr.user.login if pr.user else None,
                 "head": pr.head.ref,
                 "base": pr.base.ref,
                 "url": pr.html_url
             })
+
+            if len(results) >= min(limit, 30):
+                break
 
         return str(results)
 
